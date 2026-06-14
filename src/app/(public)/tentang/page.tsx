@@ -13,7 +13,7 @@ const MISI = [
 ];
 
 const TIM = [
-  { nama: "dr. RSUD Sofifi", jabatan: "Ketua Tim Mutu", inisial: "K" },
+  { nama: "dr. RSU Sofifi", jabatan: "Ketua Tim Mutu", inisial: "K" },
   { nama: "Staf Tim Mutu", jabatan: "Sekretaris", inisial: "S" },
   { nama: "Pelaksana Mutu", jabatan: "Anggota", inisial: "A" },
 ];

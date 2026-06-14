@@ -1,6 +1,6 @@
 -- =============================================================
 -- SMART MUTU — Skema Database (Supabase / PostgreSQL)
--- RSUD Sofifi — Sistem Pelaporan & Monitoring Indikator Mutu
+-- RSU Sofifi — Sistem Pelaporan & Monitoring Indikator Mutu
 -- =============================================================
 -- Cara pakai:
 --   1. Buka Supabase → SQL Editor → New query

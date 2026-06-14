@@ -3,9 +3,9 @@ import "./globals.css";
 import "sweetalert2/dist/sweetalert2.min.css";
 
 export const metadata: Metadata = {
-  title: "Smart Mutu — RSUD Sofifi",
+  title: "Smart Mutu — RSU Sofifi",
   description:
-    "Sistem Pelaporan & Monitoring Indikator Mutu RSUD Sofifi",
+    "Sistem Pelaporan & Monitoring Indikator Mutu RSU Sofifi",
 };
 
 export default function RootLayout({

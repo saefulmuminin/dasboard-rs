@@ -1,10 +1,10 @@
 // Identitas & konstanta situs — ubah di satu tempat ini saja.
 export const SITE = {
   nama: "Smart Mutu",
-  rs: "RSUD Sofifi",
+  rs: "RSU Sofifi",
   // GANTI dengan nomor WhatsApp Tim Mutu (format internasional tanpa +, mis. 62812xxxx)
   waNumber: "6281234567890",
-  waTextDefault: "Halo Tim Mutu RSUD Sofifi, saya ingin bertanya.",
+  waTextDefault: "Halo Tim Mutu RSU Sofifi, saya ingin bertanya.",
   email: "mutu@rsudsofifi.go.id", // ganti sesuai email resmi
   alamat: "Sofifi, Maluku Utara",
 };
