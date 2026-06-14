@@ -167,7 +167,7 @@ export default async function DashboardHome() {
       ) : (
         <>
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
-            <StatCard label="Capaian Rata-rata" value={`${capaianUnit}%`} icon={I.trend} tone="brand" />
+            <StatCard label="Capaian Keseluruhan" value={`${capaianUnit}%`} icon={I.trend} tone="brand" />
             <StatCard label="Total Laporan" value={total} icon={I.stack} tone="blue" href="/dashboard/laporan" />
             <StatCard label="Disetujui" value={counts.approved} icon={I.check} tone="green" href="/dashboard/laporan" />
             <StatCard label="Menunggu Verifikasi" value={counts.submitted} icon={I.clock} tone="amber" href="/dashboard/laporan" />

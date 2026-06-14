@@ -8,6 +8,7 @@ import {
 
 export type GridRow = Record<string, number | string | null>; // { unit, [bulanLabel]: capaian }
 export type LinePoint = { label: string; capaian: number; target: number | null };
+export type RsTotal = { label: string; num: number; den: number; hasil: number };
 
 export type IndReport = {
   id: number;
@@ -19,6 +20,7 @@ export type IndReport = {
   units: string[]; // nama unit yang melapor
   grid: GridRow[]; // satu baris per unit
   line: LinePoint[]; // satu titik per bulan
+  rsTotals: RsTotal[]; // total RS keseluruhan per bulan (Σnum, Σden, hasil)
 };
 
 // Warna per bulan (mengikuti gaya laporan: biru, merah, hijau, ungu, teal, ...)
@@ -47,6 +49,9 @@ export default function IndicatorReportSection({ reports }: { reports: IndReport
     a.length ? Math.round((a.reduce((s, v) => s + v, 0) / a.length) * 100) / 100 : null;
   const avgCapaian = avg(r.line.map((p) => p.capaian));
   const avgTarget = avg(r.line.filter((p) => p.target != null).map((p) => p.target as number));
+  const rsLast = r.rsTotals.length ? r.rsTotals[r.rsTotals.length - 1] : null;
+  const rsTercapai =
+    rsLast && r.target != null ? rsLast.hasil >= r.target : null;
 
   return (
     <div className="space-y-5">
@@ -68,6 +73,47 @@ export default function IndicatorReportSection({ reports }: { reports: IndReport
           ))}
         </select>
       </div>
+
+      {/* ---- Capaian RS Keseluruhan (Σnum ÷ Σden × 100), seperti kotak R/S laporan ---- */}
+      {rsLast && (
+        <div className="rounded-2xl border border-brand-100 bg-brand-50/60 p-5 shadow-sm">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-brand-700">
+                Capaian RS Keseluruhan — {rsLast.label}
+              </p>
+              <p className="mt-1 text-sm text-slate-500">
+                Σ Numerator ÷ Σ Denominator × 100 (gabungan seluruh unit)
+              </p>
+            </div>
+            {rsTercapai != null && (
+              <span
+                className={`rounded-full px-3 py-1 text-xs font-bold ${
+                  rsTercapai ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                }`}
+              >
+                {rsTercapai ? "Tercapai" : "Belum Tercapai"}
+                {r.target != null ? ` (target ${r.target}${sat})` : ""}
+              </span>
+            )}
+          </div>
+
+          <div className="mt-4 grid grid-cols-3 gap-3 text-center">
+            <div className="rounded-xl bg-white p-3 ring-1 ring-slate-100">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Numerator</p>
+              <p className="mt-0.5 text-2xl font-extrabold text-slate-800">{rsLast.num}</p>
+            </div>
+            <div className="rounded-xl bg-white p-3 ring-1 ring-slate-100">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Denumerator</p>
+              <p className="mt-0.5 text-2xl font-extrabold text-slate-800">{rsLast.den}</p>
+            </div>
+            <div className="rounded-xl bg-brand-600 p-3 text-white">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-brand-50/80">Hasil</p>
+              <p className="mt-0.5 text-2xl font-extrabold">{rsLast.hasil}{sat}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ---- Diagram 1: Bar berkelompok per unit × bulan ---- */}
       <div className={card}>
@@ -184,6 +230,11 @@ export default function IndicatorReportSection({ reports }: { reports: IndReport
             </tbody>
           </table>
         </div>
+
+        <p className="mt-3 text-xs leading-relaxed text-slate-400">
+          <span className="font-semibold text-slate-500">Capaian (per bulan)</span> = Σ numerator ÷ Σ denominator × 100.{" "}
+          <span className="font-semibold text-slate-500">Nilai Rata-Rata</span> = rata-rata capaian per bulan = (jumlah capaian semua bulan) ÷ (banyaknya bulan). Contoh: (60% + 71% + 98% + 95%) ÷ 4 = 81%.
+        </p>
       </div>
     </div>
   );

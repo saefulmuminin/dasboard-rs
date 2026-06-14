@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { NAMA_BULAN } from "@/lib/site";
 import TrendChart, { type TrendPoint } from "@/components/TrendChart";
+import { rsOfficial } from "@/lib/rsOfficialTotals";
 
 export const dynamic = "force-dynamic";
 
@@ -62,10 +63,15 @@ export default async function DetailIndikatorPage({
     (a, b) => a.tahun - b.tahun || a.bulan - b.bulan,
   );
 
-  const data: TrendPoint[] = agg.map((a) => ({
-    label: `${NAMA_BULAN[a.bulan]?.slice(0, 3)} ${a.tahun}`,
-    capaian: a.den > 0 ? Math.round((a.num / a.den) * 10000) / 100 : 0,
-  }));
+  const data: TrendPoint[] = agg.map((a) => {
+    const off = rsOfficial(indikator.nomor, a.tahun, a.bulan); // total resmi RS bila ada
+    const num = off ? off.num : a.num;
+    const den = off ? off.den : a.den;
+    return {
+      label: `${NAMA_BULAN[a.bulan]?.slice(0, 3)} ${a.tahun}`,
+      capaian: den > 0 ? Math.round((num / den) * 10000) / 100 : 0,
+    };
+  });
 
   const terkini = data.length ? data[data.length - 1] : null;
   const tercapai =

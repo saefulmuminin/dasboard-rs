@@ -5,6 +5,7 @@ import MonitoringCharts, {
   type IndPoint, type UnitPoint, type TrendPoint,
 } from "@/components/MonitoringCharts";
 import IndicatorReportSection, { type IndReport } from "@/components/IndicatorReportSection";
+import { rsOfficial } from "@/lib/rsOfficialTotals";
 
 export const dynamic = "force-dynamic";
 
@@ -37,9 +38,12 @@ export default async function MonitoringPage() {
     let capaian: number | null = null;
     if (rs.length) {
       const maxKey = Math.max(...rs.map((r) => r.tahun * 100 + r.bulan));
+      const ty = Math.floor(maxKey / 100), bl = maxKey % 100;
       const latest = rs.filter((r) => r.tahun * 100 + r.bulan === maxKey);
-      const num = latest.reduce((s, r) => s + (Number(r.numerator) || 0), 0);
-      const den = latest.reduce((s, r) => s + (Number(r.denominator) || 0), 0);
+      let num = latest.reduce((s, r) => s + (Number(r.numerator) || 0), 0);
+      let den = latest.reduce((s, r) => s + (Number(r.denominator) || 0), 0);
+      const off = rsOfficial(ind.nomor, ty, bl); // total resmi RS bila ada
+      if (off) { num = off.num; den = off.den; }
       capaian = den > 0 ? r2((num / den) * 100) : 0;
     }
     const tercapai = capaian != null && ind.target != null ? capaian >= ind.target : null;
@@ -108,14 +112,19 @@ export default async function MonitoringPage() {
         return row;
       });
 
-      const line = monthKeys.map((k) => {
+      // Total RS keseluruhan per bulan: Σnumerator, Σdenominator, Hasil = Σnum/Σden×100
+      const rsTotals = monthKeys.map((k) => {
+        const ty = Math.floor(k / 100), bl = k % 100;
         const mr = rs.filter((r) => r.tahun * 100 + r.bulan === k);
-        const num = mr.reduce((s, r) => s + (Number(r.numerator) || 0), 0);
-        const den = mr.reduce((s, r) => s + (Number(r.denominator) || 0), 0);
-        return { label: mlabel(Math.floor(k / 100), k % 100), capaian: den > 0 ? r2((num / den) * 100) : 0, target: ind.target };
+        let num = mr.reduce((s, r) => s + (Number(r.numerator) || 0), 0);
+        let den = mr.reduce((s, r) => s + (Number(r.denominator) || 0), 0);
+        const off = rsOfficial(ind.nomor, ty, bl); // total resmi RS bila ada
+        if (off) { num = off.num; den = off.den; }
+        return { label: mlabel(ty, bl), num, den, hasil: den > 0 ? r2((num / den) * 100) : 0 };
       });
+      const line = rsTotals.map((t) => ({ label: t.label, capaian: t.hasil, target: ind.target }));
 
-      return { id: ind.id, nomor: ind.nomor, nama: ind.nama, satuan: ind.satuan, target: ind.target, months, units, grid, line };
+      return { id: ind.id, nomor: ind.nomor, nama: ind.nama, satuan: ind.satuan, target: ind.target, months, units, grid, line, rsTotals };
     });
 
   // --- KPI ---
