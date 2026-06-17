@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BAST — Smart Mutu RSU Sofifi</title>
+<style>
+  :root { --teal:#0d9488; --teal-d:#0f766e; --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; }
+  * { box-sizing:border-box; }
+  body { font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif; color:var(--ink); margin:0; background:#f1f5f9; line-height:1.65; }
+  .page { max-width:760px; margin:24px auto; background:#fff; padding:44px 52px; box-shadow:0 1px 12px rgba(0,0,0,.06); }
+  .head { text-align:center; border-bottom:3px solid var(--teal); padding-bottom:14px; }
+  .head h1 { margin:0; font-size:20px; letter-spacing:1px; color:var(--ink); }
+  .head p { margin:4px 0 0; font-size:12px; color:var(--muted); }
+  p.body { font-size:13.5px; margin:18px 0 0; text-align:justify; }
+  .parties { margin:14px 0; }
+  .pty { font-size:13.5px; margin:10px 0; }
+  .pty table { margin-top:4px; border-collapse:collapse; font-size:13px; }
+  .pty td { padding:1px 0; vertical-align:top; }
+  .pty td:first-child { width:120px; color:var(--muted); padding-right:10px; }
+  .pty .nm { font-weight:700; }
+  ul.scope { font-size:13px; margin:10px 0 0; padding-left:20px; }
+  ul.scope li { margin-bottom:5px; text-align:justify; }
+  .signs { display:flex; justify-content:space-between; gap:40px; margin-top:46px; text-align:center; font-size:13px; }
+  .signs .col { flex:1; }
+  .signs .space { height:74px; }
+  .signs .nm { font-weight:700; border-top:1px solid var(--ink); display:inline-block; padding-top:4px; min-width:170px; }
+  .hint { background:#ecfeff; border:1px solid #a5f3fc; color:#155e63; font-size:12px; padding:10px 14px; border-radius:8px; max-width:760px; margin:0 auto; text-align:center; }
+  @media print { body{background:#fff;} .page{box-shadow:none;margin:0;max-width:none;padding:22px 26px;} .hint{display:none;} @page{size:A4;margin:16mm;} }
+</style>
+</head>
+<body>
+<div class="hint">Tekan <b>Ctrl/Cmd + P</b> → <b>Save as PDF</b>. (Kotak ini tidak ikut tercetak.)</div>
+<div class="page">
+  <div class="head">
+    <h1>BERITA ACARA SERAH TERIMA</h1>
+    <p>Nomor: [BAST/2026/06/001]</p>
+  </div>
+
+  <p class="body">Pada hari ini, [hari, tanggal] bulan [....] tahun Dua Ribu Dua Puluh Enam, yang bertanda tangan di bawah ini:</p>
+
+  <div class="parties">
+    <div class="pty">
+      <table>
+        <tr><td>Nama</td><td class="nm">Saeful Muminin</td></tr>
+        <tr><td>Alamat</td><td>Jakarta</td></tr>
+        <tr><td>Kontak</td><td>0857-9886-4579 · saeful2026027@gmail.com</td></tr>
+        <tr><td>Selanjutnya</td><td>disebut sebagai <b>PIHAK PERTAMA</b> (yang menyerahkan).</td></tr>
+      </table>
+    </div>
+    <div class="pty">
+      <table>
+        <tr><td>Nama</td><td class="nm">Tim Mutu RSU Sofifi</td></tr>
+        <tr><td>Instansi</td><td>RSU Sofifi, Sofifi, Maluku Utara</td></tr>
+        <tr><td>Selanjutnya</td><td>disebut sebagai <b>PIHAK KEDUA</b> (yang menerima).</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <p class="body">PIHAK PERTAMA telah menyerahkan, dan PIHAK KEDUA telah menerima, hasil pekerjaan pengembangan Sistem Informasi <b>&ldquo;Smart Mutu&rdquo;</b> (Pelaporan &amp; Monitoring Indikator Mutu Pelayanan RSU Sofifi) dalam keadaan berfungsi dengan baik, dengan rincian sebagai berikut:</p>
+
+  <ul class="scope">
+    <li>Aplikasi web dapat diakses pada: <b>https://dasboard-rs.vercel.app</b></li>
+    <li>Halaman publik (beranda indikator, detail indikator &amp; grafik, tentang, kontak).</li>
+    <li>Dashboard internal: input laporan, alur verifikasi/approval, monitoring &amp; grafik, kelola 18 indikator, kelola unit, kelola pengguna.</li>
+    <li>Sistem multi-peran (Tim Mutu &amp; Petugas Unit) dengan keamanan data tingkat baris (RLS).</li>
+    <li>Akun admin (Tim Mutu) dan akun unit telah diserahkan kepada PIHAK KEDUA.</li>
+    <li>Migrasi/input data capaian indikator periode Mei 2026.</li>
+    <li>Pelatihan penggunaan dan dokumentasi singkat.</li>
+  </ul>
+
+  <p class="body">Dengan ditandatanganinya Berita Acara ini, pekerjaan dinyatakan telah selesai dan diterima dengan baik oleh PIHAK KEDUA. Berita Acara ini dibuat dalam rangkap secukupnya untuk dipergunakan sebagaimana mestinya.</p>
+
+  <div class="signs">
+    <div class="col">
+      <div>PIHAK KEDUA,</div>
+      <div style="font-size:11px;color:var(--muted)">Yang Menerima</div>
+      <div class="space"></div>
+      <div class="nm">Tim Mutu RSU Sofifi</div>
+    </div>
+    <div class="col">
+      <div>PIHAK PERTAMA,</div>
+      <div style="font-size:11px;color:var(--muted)">Yang Menyerahkan</div>
+      <div class="space"></div>
+      <div class="nm">Saeful Muminin</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
