@@ -1,6 +1,6 @@
-# Smart Mutu — RSUD Sofifi
+# Simpati Mutu — RSU Sofifi
 
-Sistem Pelaporan & Monitoring Indikator Mutu RSUD Sofifi.
+Sistem Pelaporan & Monitoring Indikator Mutu RSU Sofifi.
 
 **Stack:** Next.js 15 (App Router, TypeScript) · Tailwind CSS · Supabase (DB + Auth + Storage) · deploy ke Vercel.
 

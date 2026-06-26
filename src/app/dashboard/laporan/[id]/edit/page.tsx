@@ -33,7 +33,7 @@ export default async function EditLaporanPage({
   const { data: rep } = await supabase
     .from("reports")
     .select(
-      "id, indicator_id, tahun, bulan, numerator, denominator, analisa, rtl, bukti_url, status, unit_id",
+      "id, indicator_id, tahun, bulan, numerator, denominator, nama_pengisi, analisa, rtl, bukti_url, status, unit_id",
     )
     .eq("id", reportId)
     .maybeSingle();

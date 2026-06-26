@@ -3,7 +3,7 @@ import "./globals.css";
 import "sweetalert2/dist/sweetalert2.min.css";
 
 export const metadata: Metadata = {
-  title: "Smart Mutu — RSU Sofifi",
+  title: "Simpati Mutu — RSU Sofifi",
   description:
     "Sistem Pelaporan & Monitoring Indikator Mutu RSU Sofifi",
   manifest: "/site.webmanifest",

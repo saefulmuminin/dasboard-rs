@@ -41,9 +41,9 @@ export default async function Home() {
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-slate-900 text-white py-24 sm:py-32">
         {/* Realistic Background Image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-40"
-          style={{ backgroundImage: "url('/login_hero.png')" }}
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-55"
+          style={{ backgroundImage: "url('/rs.jpeg')" }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
 

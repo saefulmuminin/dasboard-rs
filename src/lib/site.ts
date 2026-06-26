@@ -1,6 +1,6 @@
 // Identitas & konstanta situs — ubah di satu tempat ini saja.
 export const SITE = {
-  nama: "Smart Mutu",
+  nama: "Simpati Mutu",
   rs: "RSU Sofifi",
   // GANTI dengan nomor WhatsApp Tim Mutu (format internasional tanpa +, mis. 62812xxxx)
   waNumber: "6281234567890",

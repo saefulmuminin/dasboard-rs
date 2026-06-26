@@ -28,6 +28,26 @@ const SHEET_NAME = "Data Mutu";
 const NAMA_BULAN = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni",
   "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
+/**
+ * TES AMAN — hanya cek koneksi & hitung jumlah data.
+ * TIDAK menulis ke Sheet. TIDAK mengubah database sama sekali.
+ * Jalankan ini DULU, lalu lihat hasilnya di: View → Executions / Logs.
+ */
+function testKoneksi() {
+  const url = SUPABASE_URL + "/rest/v1/reports?select=id";
+  const res = UrlFetchApp.fetch(url, {
+    method: "get",
+    headers: { apikey: SERVICE_ROLE_KEY, Authorization: "Bearer " + SERVICE_ROLE_KEY },
+    muteHttpExceptions: true,
+  });
+  if (res.getResponseCode() === 200) {
+    const n = JSON.parse(res.getContentText()).length;
+    Logger.log("✅ Koneksi OK. Total data laporan: " + n + " baris. (Sheet & database TIDAK diubah.)");
+  } else {
+    Logger.log("❌ Gagal (" + res.getResponseCode() + "): " + res.getContentText());
+  }
+}
+
 /** Tarik SEMUA laporan dari Supabase lalu timpa penuh ke sheet (anti duplikat). */
 function syncReports() {
   const url = SUPABASE_URL + "/rest/v1/reports"

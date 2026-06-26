@@ -21,6 +21,7 @@ export type LaporanInitial = {
   bulan: number;
   numerator: number;
   denominator: number;
+  nama_pengisi: string | null;
   analisa: string | null;
   rtl: string | null;
   bukti_url: string | null;
@@ -55,6 +56,7 @@ export default function LaporanForm({
   const [denominator, setDenominator] = useState<string>(
     initial ? String(initial.denominator) : "",
   );
+  const [namaPengisi, setNamaPengisi] = useState(initial?.nama_pengisi ?? "");
   const [analisa, setAnalisa] = useState(initial?.analisa ?? "");
   const [rtl, setRtl] = useState(initial?.rtl ?? "");
   const [file, setFile] = useState<File | null>(null);
@@ -73,12 +75,20 @@ export default function LaporanForm({
       showError("Validasi Gagal", "Pilih indikator terlebih dahulu.");
       return;
     }
+    if (!namaPengisi.trim()) {
+      showError("Validasi Gagal", "Nama pengisi laporan wajib diisi.");
+      return;
+    }
     if (numerator === "" || denominator === "") {
       showError("Validasi Gagal", "Numerator dan denominator wajib diisi.");
       return;
     }
     if (Number(denominator) <= 0) {
       showError("Validasi Gagal", "Denominator harus lebih besar dari 0.");
+      return;
+    }
+    if (file && file.size > 10 * 1024 * 1024) {
+      showError("File Terlalu Besar", "Ukuran file bukti dukung maksimal 10MB.");
       return;
     }
 
@@ -107,6 +117,7 @@ export default function LaporanForm({
       bulan,
       numerator: Number(numerator),
       denominator: Number(denominator),
+      nama_pengisi: namaPengisi.trim() || null,
       analisa: analisa || null,
       rtl: rtl || null,
       bukti_url: buktiPath,
@@ -157,6 +168,17 @@ export default function LaporanForm({
       }}
       className="space-y-6"
     >
+      <div>
+        <label className={labelCls}>Nama Pengisi Laporan</label>
+        <input
+          type="text"
+          value={namaPengisi}
+          onChange={(e) => setNamaPengisi(e.target.value)}
+          className={inputCls}
+          placeholder="Nama petugas yang mengisi laporan ini"
+        />
+      </div>
+
       <div>
         <label className={labelCls}>Indikator Mutu</label>
         <select
@@ -271,7 +293,7 @@ export default function LaporanForm({
 
       <div>
         <label className={labelCls}>
-          Dokumen Bukti Dukung (PDF) <span className="text-slate-400 font-medium normal-case">— Opsional</span>
+          Dokumen Bukti Dukung (PDF/Gambar) <span className="text-slate-400 font-medium normal-case">— Opsional</span>
         </label>
         <div className="mt-1 flex items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50/30 px-6 py-5">
           <div className="space-y-1 text-center">
@@ -281,17 +303,17 @@ export default function LaporanForm({
             </svg>
             <div className="flex text-sm text-slate-600">
               <label className="relative cursor-pointer rounded-md bg-white font-semibold text-brand-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-brand-500 focus-within:ring-offset-2 hover:text-brand-500">
-                <span>Pilih file PDF</span>
+                <span>Pilih file (PDF/Gambar)</span>
                 <input
                   type="file"
-                  accept="application/pdf"
+                  accept="application/pdf,image/*"
                   onChange={(e) => setFile(e.target.files?.[0] ?? null)}
                   className="sr-only"
                 />
               </label>
               <p className="pl-1">atau seret file ke sini</p>
             </div>
-            <p className="text-xs text-slate-400">PDF maksimal 10MB</p>
+            <p className="text-xs text-slate-400">PDF atau gambar (JPG/PNG), maks 10MB</p>
             {file && (
               <p className="text-xs font-semibold text-brand-600 mt-2">
                 Terpilih: {file.name}

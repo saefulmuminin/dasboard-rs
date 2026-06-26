@@ -12,6 +12,7 @@ type Row = {
   numerator: number;
   denominator: number;
   hasil: number;
+  nama_pengisi: string | null;
   analisa: string | null;
   rtl: string | null;
   bukti_url: string | null;
@@ -116,6 +117,11 @@ export default function VerifikasiList({
 
             {/* Rincian data */}
             <div className="mt-4 grid grid-cols-1 gap-4 text-sm sm:grid-cols-2 bg-slate-50 rounded-xl p-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Pengisi Laporan</p>
+                <p className="mt-1 font-semibold text-slate-700">{r.nama_pengisi || "—"}</p>
+              </div>
+
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Variabel Capaian</p>
                 <p className="mt-1 font-semibold text-slate-700">
