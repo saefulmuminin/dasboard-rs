@@ -17,8 +17,8 @@ if (!url || !key) { console.error("✗ URL / service_role key tidak ada di .env"
 
 const sb = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 
-const ADMIN = { email: "admin@rsudsofifi.go.id", password: "MutuAdmin2026", nama: "Administrator Tim Mutu", role: "mutu" };
-const UNIT = { email: "unit.amarilis@rsudsofifi.go.id", password: "UnitAmarilis2026", nama: "Petugas Unit Amarilis", role: "unit", unitNama: "Amarilis" };
+const ADMIN = { email: "admin@rsusofifi.go.id", password: "MutuAdmin2026", nama: "Administrator Tim Mutu", role: "mutu" };
+const UNIT = { email: "unit.amarilis@rsusofifi.go.id", password: "UnitAmarilis2026", nama: "Petugas Unit Amarilis", role: "unit", unitNama: "Amarilis" };
 
 // cari id unit untuk contoh akun unit
 const { data: unitRow } = await sb.from("units").select("id").eq("nama", UNIT.unitNama).maybeSingle();

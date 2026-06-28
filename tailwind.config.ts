@@ -7,7 +7,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Warna brand RSUD Sofifi — teal/hijau
+        // Warna brand RSU Sofifi — teal/hijau
         brand: {
           50:  "#f0fdfa",
           100: "#ccfbf1",

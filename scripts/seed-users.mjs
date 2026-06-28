@@ -7,7 +7,7 @@
 //
 // Opsional:
 //   SEED_PASSWORD="KataSandi123"  (default: Mutu#2026)
-//   SEED_DOMAIN="unit.rsudsofifi.local"
+//   SEED_DOMAIN="unit.rsusofifi.local"
 //
 // CATATAN:
 // - service_role key TIDAK disimpan di file mana pun — hanya dipakai sekali via env var.
@@ -32,7 +32,7 @@ const url = env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceKey =
   process.env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SERVICE_ROLE_KEY;
 const DEFAULT_PASSWORD = process.env.SEED_PASSWORD || "Mutu#2026";
-const DOMAIN = process.env.SEED_DOMAIN || "unit.rsudsofifi.local";
+const DOMAIN = process.env.SEED_DOMAIN || "unit.rsusofifi.local";
 
 if (!url) {
   console.error("✗ NEXT_PUBLIC_SUPABASE_URL tidak ditemukan di .env");

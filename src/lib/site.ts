@@ -5,7 +5,7 @@ export const SITE = {
   // GANTI dengan nomor WhatsApp Tim Mutu (format internasional tanpa +, mis. 62812xxxx)
   waNumber: "6281234567890",
   waTextDefault: "Halo Tim Mutu RSU Sofifi, saya ingin bertanya.",
-  email: "mutu@rsudsofifi.go.id", // ganti sesuai email resmi
+  email: "mutu@rsusofifi.go.id", // ganti sesuai email resmi
   alamat: "Sofifi, Maluku Utara",
 };
 

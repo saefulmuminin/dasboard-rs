@@ -57,7 +57,7 @@ export default function LupaPasswordPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-10 pr-4 py-3 text-sm text-slate-800 outline-none transition-all duration-200 focus:border-brand-500 focus:bg-white focus:ring-4 focus:ring-brand-500/10"
-              placeholder="email@rsudsofifi.go.id"
+              placeholder="email@rsusofifi.go.id"
             />
           </div>
         </div>
