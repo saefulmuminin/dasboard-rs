@@ -18,13 +18,23 @@ export default async function InputLaporanPage() {
     );
   }
 
-  const { data } = await supabase
-    .from("indicators")
-    .select("id, nomor, nama, satuan, target")
-    .eq("aktif", true)
-    .order("nomor", { ascending: true });
+  const [{ data }, iu] = await Promise.all([
+    supabase.from("indicators").select("id, nomor, nama, satuan, target").eq("aktif", true).order("nomor", { ascending: true }),
+    supabase.from("indicator_units").select("indicator_id, unit_id"),
+  ]);
 
-  const indikators = (data as IndikatorOpt[]) ?? [];
+  // Indikator "khusus" hanya muncul untuk unit penanggungjawabnya; tanpa penugasan = umum (semua unit).
+  const assignedUnits = new Map<number, Set<number>>();
+  if (!iu.error) {
+    for (const a of (iu.data as { indicator_id: number; unit_id: number }[]) ?? []) {
+      if (!assignedUnits.has(a.indicator_id)) assignedUnits.set(a.indicator_id, new Set());
+      assignedUnits.get(a.indicator_id)!.add(a.unit_id);
+    }
+  }
+  const indikators = ((data as IndikatorOpt[]) ?? []).filter((i) => {
+    const units = assignedUnits.get(i.id);
+    return !units || units.size === 0 || units.has(unitId);
+  });
 
   return (
     <div className="space-y-6 max-w-3xl">

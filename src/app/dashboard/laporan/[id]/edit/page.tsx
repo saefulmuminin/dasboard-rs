@@ -40,11 +40,23 @@ export default async function EditLaporanPage({
 
   if (!rep || rep.unit_id !== unitId || rep.status === "approved") notFound();
 
-  const { data } = await supabase
-    .from("indicators")
-    .select("id, nomor, nama, satuan, target")
-    .eq("aktif", true)
-    .order("nomor", { ascending: true });
+  const [{ data }, iu] = await Promise.all([
+    supabase.from("indicators").select("id, nomor, nama, satuan, target").eq("aktif", true).order("nomor", { ascending: true }),
+    supabase.from("indicator_units").select("indicator_id, unit_id"),
+  ]);
+
+  const assignedUnits = new Map<number, Set<number>>();
+  if (!iu.error) {
+    for (const a of (iu.data as { indicator_id: number; unit_id: number }[]) ?? []) {
+      if (!assignedUnits.has(a.indicator_id)) assignedUnits.set(a.indicator_id, new Set());
+      assignedUnits.get(a.indicator_id)!.add(a.unit_id);
+    }
+  }
+  const indikators = ((data as IndikatorOpt[]) ?? []).filter((i) => {
+    const units = assignedUnits.get(i.id);
+    const visible = !units || units.size === 0 || units.has(unitId);
+    return visible || i.id === rep.indicator_id; // selalu sertakan indikator laporan ini
+  });
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -57,7 +69,7 @@ export default async function EditLaporanPage({
       <div className="rounded-3xl border border-slate-100 bg-white p-6 sm:p-8 shadow-sm">
         <LaporanForm
           mode="edit"
-          indikators={(data as IndikatorOpt[]) ?? []}
+          indikators={indikators}
           unitId={unitId}
           userId={user!.id}
           initial={rep as LaporanInitial}
