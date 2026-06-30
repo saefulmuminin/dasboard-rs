@@ -57,10 +57,17 @@ const PenggunaIcon = () => (
   </svg>
 );
 
+const ProfileIcon = () => (
+  <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+  </svg>
+);
+
 const NAV_UNIT: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: <HomeIcon /> },
   { href: "/dashboard/laporan/baru", label: "Input Laporan", icon: <EditIcon /> },
   { href: "/dashboard/laporan", label: "Laporan Saya", icon: <LaporanIcon /> },
+  { href: "/dashboard/profil", label: "Profil", icon: <ProfileIcon /> },
 ];
 
 const NAV_MUTU: NavItem[] = [
@@ -70,6 +77,7 @@ const NAV_MUTU: NavItem[] = [
   { href: "/dashboard/indikator", label: "Kelola Indikator", icon: <IndikatorIcon /> },
   { href: "/dashboard/unit", label: "Kelola Unit", icon: <UnitIcon /> },
   { href: "/dashboard/pengguna", label: "Kelola Pengguna", icon: <PenggunaIcon /> },
+  { href: "/dashboard/profil", label: "Profil", icon: <ProfileIcon /> },
 ];
 
 export default function DashboardShell({
@@ -164,19 +172,24 @@ export default function DashboardShell({
 
         {/* User Info & Footer */}
         <div className="border-t border-white/15 pt-5 mt-5 space-y-4">
-          <div className="bg-white/10 rounded-2xl p-4">
+          <Link
+            href="/dashboard/profil"
+            onClick={() => setOpen(false)}
+            className="block bg-white/10 rounded-2xl p-4 transition-colors hover:bg-white/15"
+          >
             <p className="truncate text-sm font-semibold text-white">{nama || "Petugas RS"}</p>
             <p className="truncate text-xs text-white/60 font-medium mt-0.5">{email}</p>
-            <div className="mt-2.5">
+            <div className="mt-2.5 flex items-center justify-between gap-2">
               <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wide uppercase ${
-                role === "mutu" 
+                role === "mutu"
                   ? "bg-white/20 text-white border border-white/30"
                   : "bg-white/10 text-white/80 border border-white/20"
               }`}>
                 {role === "mutu" ? "Tim Mutu" : "Unit Pelapor"}
               </span>
+              <span className="text-[10px] font-semibold text-white/50">Kelola →</span>
             </div>
-          </div>
+          </Link>
           <form action={signOut}>
             <button className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/20 hover:text-white active:scale-[0.98]">
               <svg className="h-4 w-4 text-white/70" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">

@@ -64,18 +64,53 @@ export default function UnitManager({ initial }: { initial: Unit[] }) {
     reload();
   }
 
-  async function hapus(id: number) {
+  async function nonaktifkan(u: Unit) {
+    const { error } = await supabase.from("units").update({ aktif: false }).eq("id", u.id);
+    if (error) {
+      showError("Gagal", error.message);
+      return;
+    }
+    showToast("success", `Unit "${u.nama}" dinonaktifkan`);
+    reload();
+  }
+
+  async function hapus(u: Unit) {
+    // Cek dulu apakah unit punya laporan (FK reports.unit_id = on delete restrict).
+    // Demi menjaga data riwayat, unit ber-laporan tidak dihapus tapi dinonaktifkan.
+    const { count } = await supabase
+      .from("reports")
+      .select("id", { count: "exact", head: true })
+      .eq("unit_id", u.id);
+
+    if ((count ?? 0) > 0) {
+      const r = await showConfirm(
+        "Unit Punya Riwayat Laporan",
+        `Unit "${u.nama}" tidak dapat dihapus karena sudah memiliki ${count} laporan — data riwayat tidak boleh hilang. ` +
+          `Sebaiknya NONAKTIFKAN: unit akan hilang dari form input petugas, tetapi datanya tetap tersimpan untuk monitoring & arsip. Nonaktifkan sekarang?`,
+        "Ya, Nonaktifkan",
+        "Batal"
+      );
+      if (r.isConfirmed) await nonaktifkan(u);
+      return;
+    }
+
     const result = await showConfirm(
       "Hapus Unit?",
-      "Tindakan ini akan menghapus unit. Operasi akan gagal jika unit sudah dikaitkan dengan laporan apa pun.",
+      `Yakin menghapus unit "${u.nama}"? Tindakan ini permanen dan tidak dapat dibatalkan.`,
       "Ya, Hapus",
       "Batal"
     );
     if (!result.isConfirmed) return;
 
-    const { error } = await supabase.from("units").delete().eq("id", id);
+    const { error } = await supabase.from("units").delete().eq("id", u.id);
     if (error) {
-      showError("Gagal Menghapus", "Tidak bisa menghapus unit: " + error.message);
+      const fk = error.code === "23503" || /foreign key/i.test(error.message);
+      showError(
+        "Gagal Menghapus",
+        fk
+          ? `Unit "${u.nama}" masih dipakai data lain. Nonaktifkan saja unit ini agar datanya tetap aman.`
+          : "Tidak bisa menghapus unit: " + error.message
+      );
       return;
     }
 
@@ -158,7 +193,7 @@ export default function UnitManager({ initial }: { initial: Unit[] }) {
                           {loadingId === u.id ? "Menyimpan..." : "Simpan"}
                         </button>
                         <button
-                          onClick={() => hapus(u.id)}
+                          onClick={() => hapus(u)}
                           className="rounded-xl border border-red-100 bg-red-50/50 px-3.5 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 hover:text-red-700 transition active:scale-[0.98]"
                         >
                           Hapus
