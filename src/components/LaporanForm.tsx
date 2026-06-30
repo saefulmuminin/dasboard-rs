@@ -95,19 +95,19 @@ export default function LaporanForm({
     setLoading(true);
     const supabase = createClient();
 
-    // Upload bukti (opsional)
+    // Upload bukti (opsional). Jika gagal, laporan TETAP disimpan tanpa bukti.
     let buktiPath = initial?.bukti_url ?? null;
+    let uploadGagal: string | null = null;
     if (file) {
       const path = `${unitId}/${tahun}-${bulan}-${indicatorId}-${Date.now()}-${file.name}`;
       const { data: up, error: upErr } = await supabase.storage
         .from("bukti")
         .upload(path, file, { upsert: false });
       if (upErr) {
-        setLoading(false);
-        showError("Gagal Mengunggah", "Gagal upload file bukti: " + upErr.message);
-        return;
+        uploadGagal = upErr.message;
+      } else {
+        buktiPath = up.path;
       }
-      buktiPath = up.path;
     }
 
     const payload = {
@@ -145,12 +145,19 @@ export default function LaporanForm({
       return;
     }
 
-    await showSuccess(
-      status === "draft" ? "Draft Disimpan" : "Laporan Terkirim",
+    const baseMsg =
       status === "draft"
         ? "Laporan berhasil disimpan sebagai draft."
-        : "Laporan berhasil dikirim untuk proses verifikasi."
-    );
+        : "Laporan berhasil dikirim untuk proses verifikasi.";
+
+    if (uploadGagal) {
+      await showSuccess(
+        status === "draft" ? "Draft Tersimpan (Bukti Belum Terlampir)" : "Laporan Terkirim (Bukti Belum Terlampir)",
+        `${baseMsg} Namun file bukti GAGAL diunggah (${uploadGagal}). Data laporan tetap aman — silakan lampirkan bukti nanti lewat menu Edit.`,
+      );
+    } else {
+      await showSuccess(status === "draft" ? "Draft Disimpan" : "Laporan Terkirim", baseMsg);
+    }
 
     router.push("/dashboard/laporan");
     router.refresh();
