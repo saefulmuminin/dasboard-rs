@@ -63,6 +63,12 @@ const ProfileIcon = () => (
   </svg>
 );
 
+const ExportIcon = () => (
+  <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
+  </svg>
+);
+
 const NAV_UNIT: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: <HomeIcon /> },
   { href: "/dashboard/laporan/baru", label: "Input Laporan", icon: <EditIcon /> },
@@ -77,6 +83,7 @@ const NAV_MUTU: NavItem[] = [
   { href: "/dashboard/indikator", label: "Kelola Indikator", icon: <IndikatorIcon /> },
   { href: "/dashboard/unit", label: "Kelola Unit", icon: <UnitIcon /> },
   { href: "/dashboard/pengguna", label: "Kelola Pengguna", icon: <PenggunaIcon /> },
+  { href: "/dashboard/export", label: "Export Laporan", icon: <ExportIcon /> },
   { href: "/dashboard/profil", label: "Profil", icon: <ProfileIcon /> },
 ];
 
