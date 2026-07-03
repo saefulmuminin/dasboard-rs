@@ -20,8 +20,9 @@ type Block = {
   total: Cell;
   hasData: boolean;
 };
+type Meta = { tahun: number; bulan: number; hanyaApproved: boolean };
 
-const THIS_YEAR = 2026; // fallback awal; diganti oleh periode terbaru saat mount
+const THIS_YEAR = 2026; // fallback; diganti oleh periode terbaru saat mount
 const pctInt = (c: Cell) => (c.den > 0 ? Math.round((c.num / c.den) * 100) : null);
 const esc = (s: string) =>
   s.replace(/[&<>"]/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[m] as string));
@@ -30,14 +31,16 @@ export default function LaporanExport({ indikators, units }: { indikators: ExpIn
   const supabase = createClient();
   const unitName = new Map(units.map((u) => [u.id, u.nama]));
 
+  // Filter aktif (bisa diubah user) — TERPISAH dari periode yang benar-benar dimuat.
   const [tahun, setTahun] = useState<number>(THIS_YEAR);
   const [bulan, setBulan] = useState<number>(5);
   const [hanyaApproved, setHanyaApproved] = useState<boolean>(true);
   const [loading, setLoading] = useState(false);
-  const [fetched, setFetched] = useState(false);
+  // Data yang sudah dimuat + periode/status-nya (sumber kebenaran untuk label & export).
   const [blocks, setBlocks] = useState<Block[]>([]);
+  const [meta, setMeta] = useState<Meta | null>(null);
 
-  function buildBlocks(reps: Rep[], ty: number, bl: number): Block[] {
+  function buildBlocks(reps: Rep[], ty: number, bl: number, appr: boolean): Block[] {
     const byInd = new Map<number, Rep[]>();
     for (const r of reps) {
       const a = byInd.get(r.indicator_id) ?? [];
@@ -62,7 +65,10 @@ export default function LaporanExport({ indikators, units }: { indikators: ExpIn
         num += c.num;
         den += c.den;
       }
-      const off = rsOfficial(ind.nomor, ty, bl);
+      // Total resmi RS (rsOfficial) HANYA dipakai pada mode "disetujui", karena
+      // angka resmi itu berbasis data terverifikasi. Jika menyertakan data belum
+      // diverifikasi, pakai jumlah per-unit apa adanya agar kolom & total konsisten.
+      const off = appr ? rsOfficial(ind.nomor, ty, bl) : null;
       const total = off ? { num: off.num, den: off.den } : { num, den };
       return { nomor: ind.nomor, nama: ind.nama, cols, cell, total, hasData: cols.length > 0 };
     });
@@ -82,30 +88,51 @@ export default function LaporanExport({ indikators, units }: { indikators: ExpIn
       showError("Gagal Memuat", error.message);
       return;
     }
-    setBlocks(buildBlocks((data as Rep[]) ?? [], ty, bl));
-    setFetched(true);
+    setBlocks(buildBlocks((data as Rep[]) ?? [], ty, bl, appr));
+    setMeta({ tahun: ty, bulan: bl, hanyaApproved: appr });
   }
 
-  // Saat mount: tentukan periode terbaru yang ada datanya, lalu tampilkan.
+  // Saat mount: pakai periode terbaru yang punya data DISETUJUI (sesuai default
+  // toggle) agar tampilan awal tidak kosong; jika belum ada approved sama sekali,
+  // pakai periode terbaru apa pun.
   useEffect(() => {
     (async () => {
-      const { data } = await supabase
+      const appr = await supabase
         .from("reports")
         .select("tahun, bulan")
+        .eq("status", "approved")
         .order("tahun", { ascending: false })
         .order("bulan", { ascending: false })
         .limit(1);
-      const y = (data?.[0]?.tahun as number) ?? THIS_YEAR;
-      const m = (data?.[0]?.bulan as number) ?? 5;
-      setTahun(y);
-      setBulan(m);
-      await tampilkan(y, m, true);
+      let y = appr.data?.[0]?.tahun as number | undefined;
+      let m = appr.data?.[0]?.bulan as number | undefined;
+      if (y == null) {
+        const any = await supabase
+          .from("reports")
+          .select("tahun, bulan")
+          .order("tahun", { ascending: false })
+          .order("bulan", { ascending: false })
+          .limit(1);
+        y = any.data?.[0]?.tahun as number | undefined;
+        m = any.data?.[0]?.bulan as number | undefined;
+      }
+      const ty = y ?? THIS_YEAR;
+      const bl = m ?? 5;
+      setTahun(ty);
+      setBulan(bl);
+      await tampilkan(ty, bl, true);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const adaData = blocks.some((b) => b.hasData);
-  const periodeLabel = `${NAMA_BULAN[bulan]} ${tahun}`;
+  // Label & filename SELALU dari periode yang dimuat (meta), bukan filter live.
+  const sBulan = meta?.bulan ?? bulan;
+  const sTahun = meta?.tahun ?? tahun;
+  const sAppr = meta?.hanyaApproved ?? hanyaApproved;
+  const periodeLabel = `${NAMA_BULAN[sBulan]} ${sTahun}`;
+  const scopeLabel = sAppr ? " (data disetujui)" : " (termasuk belum diverifikasi)";
+  const dirty = meta != null && (meta.bulan !== bulan || meta.tahun !== tahun || meta.hanyaApproved !== hanyaApproved);
 
   // ---------- Export XLSX ----------
   function exportXlsx() {
@@ -134,7 +161,7 @@ export default function LaporanExport({ indikators, units }: { indikators: ExpIn
     put(R, 0, `LAPORAN INDIKATOR MUTU — ${SITE.rs}`, "s", stTitle);
     merges.push({ s: { r: R, c: 0 }, e: { r: R, c: 6 } });
     R++;
-    put(R, 0, `Periode: ${periodeLabel}${hanyaApproved ? " (data disetujui)" : " (termasuk belum diverifikasi)"}`, "s", stSub);
+    put(R, 0, `Periode: ${periodeLabel}${scopeLabel}`, "s", stSub);
     merges.push({ s: { r: R, c: 0 }, e: { r: R, c: 6 } });
     R += 2;
 
@@ -175,7 +202,7 @@ export default function LaporanExport({ indikators, units }: { indikators: ExpIn
     ws["!merges"] = merges;
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Laporan Mutu");
-    XLSX.writeFile(wb, `Laporan-Mutu-${NAMA_BULAN[bulan]}-${tahun}.xlsx`);
+    XLSX.writeFile(wb, `Laporan-Mutu-${NAMA_BULAN[sBulan]}-${sTahun}.xlsx`);
   }
 
   // ---------- Export PDF (buka jendela cetak) ----------
@@ -206,21 +233,21 @@ export default function LaporanExport({ indikators, units }: { indikators: ExpIn
 
     const html = `<!doctype html><html><head><meta charset="utf-8"><title>Laporan Mutu ${esc(periodeLabel)}</title>
       <style>
-        @page { size: A4 landscape; margin: 12mm; }
+        @page { size: A4 landscape; margin: 10mm; }
         * { box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; color: #0f172a; font-size: 10px; margin: 0; }
-        h1 { font-size: 16px; margin: 0 0 2px; }
+        body { font-family: Arial, sans-serif; color: #0f172a; font-size: 9px; margin: 0; }
+        h1 { font-size: 15px; margin: 0 0 2px; }
         .sub { color: #475569; font-style: italic; margin: 0 0 14px; }
-        h3 { font-size: 11px; margin: 14px 0 4px; color: #0f766e; page-break-after: avoid; }
-        table { border-collapse: collapse; width: 100%; margin-bottom: 6px; page-break-inside: avoid; }
-        th, td { border: 1px solid #94a3b8; padding: 3px 6px; text-align: center; white-space: nowrap; }
+        h3 { font-size: 10px; margin: 12px 0 4px; color: #0f766e; page-break-after: avoid; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 6px; page-break-inside: avoid; table-layout: auto; }
+        th, td { border: 1px solid #94a3b8; padding: 2px 4px; text-align: center; word-break: break-word; }
         th { background: #e2e8f0; font-weight: 700; }
-        td.lbl, .c0 { text-align: left; font-weight: 700; background: #f8fafc; }
+        td.lbl, .c0 { text-align: left; font-weight: 700; background: #f8fafc; white-space: nowrap; }
         th.tot, td.tot { background: #ccfbf1; font-weight: 700; }
         .note { color: #94a3b8; font-style: italic; margin: 2px 0 8px; }
       </style></head><body>
       <h1>LAPORAN INDIKATOR MUTU — ${esc(SITE.rs)}</h1>
-      <p class="sub">Periode: ${esc(periodeLabel)}${hanyaApproved ? " (data disetujui)" : " (termasuk belum diverifikasi)"}</p>
+      <p class="sub">Periode: ${esc(periodeLabel)}${scopeLabel}</p>
       ${body}
       <script>window.onload=function(){window.print();}</script>
       </body></html>`;
@@ -253,7 +280,7 @@ export default function LaporanExport({ indikators, units }: { indikators: ExpIn
             <input
               type="number"
               value={tahun}
-              onChange={(e) => setTahun(Number(e.target.value))}
+              onChange={(e) => setTahun(Number(e.target.value) || THIS_YEAR)}
               className={`${inp} w-24`}
             />
           </div>
@@ -264,9 +291,9 @@ export default function LaporanExport({ indikators, units }: { indikators: ExpIn
           <button
             onClick={() => tampilkan(tahun, bulan, hanyaApproved)}
             disabled={loading}
-            className="rounded-lg bg-slate-800 px-5 py-2 text-sm font-semibold text-white transition hover:bg-slate-900 active:scale-[0.98] disabled:opacity-60"
+            className={`rounded-lg px-5 py-2 text-sm font-semibold text-white transition active:scale-[0.98] disabled:opacity-60 ${dirty ? "bg-brand-600 hover:bg-brand-700 ring-2 ring-brand-300 ring-offset-1" : "bg-slate-800 hover:bg-slate-900"}`}
           >
-            {loading ? "Memuat..." : "Tampilkan"}
+            {loading ? "Memuat..." : dirty ? "Tampilkan (filter berubah)" : "Tampilkan"}
           </button>
           <div className="ml-auto flex gap-2">
             <button
@@ -285,20 +312,25 @@ export default function LaporanExport({ indikators, units }: { indikators: ExpIn
             </button>
           </div>
         </div>
-        {fetched && !adaData && (
+        {dirty && (
+          <p className="mt-3 rounded-lg bg-brand-50 px-3 py-2 text-sm text-brand-800">
+            Filter telah diubah. Klik <strong>Tampilkan</strong> untuk memuat data periode baru. (Laporan & export saat ini masih untuk <strong>{periodeLabel}</strong>.)
+          </p>
+        )}
+        {meta != null && !adaData && (
           <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
             Tidak ada data untuk <strong>{periodeLabel}</strong>
-            {hanyaApproved ? " pada status disetujui. Hilangkan centang “Hanya data disetujui” untuk melihat data yang masih diproses." : "."}
+            {sAppr ? " pada status disetujui. Hilangkan centang “Hanya data disetujui” lalu klik Tampilkan untuk melihat data yang masih diproses." : "."}
           </p>
         )}
       </div>
 
       {/* Preview */}
-      {adaData && (
+      {meta != null && adaData && (
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="mb-4 border-b border-slate-100 pb-3">
             <h2 className="text-lg font-bold text-slate-800">Laporan Indikator Mutu — {SITE.rs}</h2>
-            <p className="text-sm italic text-slate-500">Periode: {periodeLabel}{hanyaApproved ? " (data disetujui)" : " (termasuk belum diverifikasi)"}</p>
+            <p className="text-sm italic text-slate-500">Periode: {periodeLabel}{scopeLabel}</p>
           </div>
           <div className="space-y-6">
             {blocks.filter((b) => b.hasData).map((b, idx) => (
