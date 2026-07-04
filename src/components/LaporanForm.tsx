@@ -46,10 +46,13 @@ export default function LaporanForm({
   const [indicatorId, setIndicatorId] = useState<number>(
     initial?.indicator_id ?? indikators[0]?.id ?? 0,
   );
-  const [tahun, setTahun] = useState<number>(initial?.tahun ?? tahunIni);
-  const [bulan, setBulan] = useState<number>(
-    initial?.bulan ?? new Date().getMonth() + 1,
-  );
+  // Default periode = BULAN LALU (laporan mutu umumnya merekap bulan sebelumnya),
+  // mengurangi kekeliruan memilih bulan berjalan.
+  const now = new Date();
+  const bulanLalu = now.getMonth() === 0 ? 12 : now.getMonth(); // getMonth() 0-11 -> bulan lalu 1-12
+  const tahunLalu = now.getMonth() === 0 ? tahunIni - 1 : tahunIni;
+  const [tahun, setTahun] = useState<number>(initial?.tahun ?? tahunLalu);
+  const [bulan, setBulan] = useState<number>(initial?.bulan ?? bulanLalu);
   const [numerator, setNumerator] = useState<string>(
     initial ? String(initial.numerator) : "",
   );
@@ -138,7 +141,10 @@ export default function LaporanForm({
     setLoading(false);
     if (error) {
       if (error.code === "23505") {
-        showError("Laporan Duplikat", "Laporan untuk indikator dan periode yang dipilih sudah terdaftar.");
+        showError(
+          "Laporan Duplikat",
+          "Laporan untuk indikator dan bulan ini sudah pernah dibuat. Untuk mengubah, buka menu \"Laporan Saya\" lalu Edit laporan tersebut. Jika sudah diverifikasi Tim Mutu, minta Tim Mutu menghapusnya agar bisa diisi ulang.",
+        );
       } else {
         showError("Gagal Menyimpan", error.message);
       }
