@@ -145,6 +145,11 @@ export default function LaporanForm({
           "Laporan Duplikat",
           "Laporan untuk indikator dan bulan ini sudah pernah dibuat. Untuk mengubah, buka menu \"Laporan Saya\" lalu Edit laporan tersebut. Jika sudah diverifikasi Tim Mutu, minta Tim Mutu menghapusnya agar bisa diisi ulang.",
         );
+      } else if (error.code === "23503" || /unit_id_fkey|foreign key/i.test(error.message)) {
+        showError(
+          "Unit Akun Bermasalah",
+          "Unit yang tertaut ke akun Anda tidak terdaftar (mungkin telah dihapus/diubah). Hubungi Tim Mutu untuk memperbaiki unit akun Anda sebelum mengirim laporan.",
+        );
       } else {
         showError("Gagal Menyimpan", error.message);
       }

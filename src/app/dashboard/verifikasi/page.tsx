@@ -14,6 +14,7 @@ type Row = {
   analisa: string | null;
   rtl: string | null;
   bukti_url: string | null;
+  submitted_at: string | null;
   indicators: { nomor: number | null; nama: string; satuan: string; target: number | null } | null;
   units: { nama: string } | null;
 };
@@ -24,7 +25,7 @@ export default async function VerifikasiPage() {
   const { data } = await supabase
     .from("reports")
     .select(
-      "id, tahun, bulan, numerator, denominator, hasil, nama_pengisi, analisa, rtl, bukti_url, indicators(nomor, nama, satuan, target), units(nama)",
+      "id, tahun, bulan, numerator, denominator, hasil, nama_pengisi, analisa, rtl, bukti_url, submitted_at, indicators(nomor, nama, satuan, target), units(nama)",
     )
     .eq("status", "submitted")
     .order("tahun", { ascending: false })

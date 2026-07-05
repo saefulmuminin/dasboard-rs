@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { NAMA_BULAN } from "@/lib/site";
+import { NAMA_BULAN, fmtWaktu } from "@/lib/site";
 import { showConfirm, showError, showToast } from "@/lib/swal";
 
 const STATUS = {
@@ -19,6 +19,7 @@ type Row = {
   bulan: number;
   hasil: number;
   status: keyof typeof STATUS;
+  submitted_at: string | null;
   indicators: { nomor: number | null; nama: string; satuan: string } | null;
 };
 
@@ -54,7 +55,7 @@ export default function LaporanSayaList({
 
     showToast("success", "Laporan berhasil dikirim");
     setRows((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, status: "submitted" } : r))
+      prev.map((r) => (r.id === id ? { ...r, status: "submitted", submitted_at: new Date().toISOString() } : r))
     );
   }
 
@@ -116,6 +117,9 @@ export default function LaporanSayaList({
                     </td>
                     <td className="px-5 py-3.5 text-slate-500 font-medium">
                       {NAMA_BULAN[r.bulan]} {r.tahun}
+                      {r.status !== "draft" && r.submitted_at && (
+                        <span className="mt-0.5 block text-[11px] font-normal text-slate-400">Dikirim: {fmtWaktu(r.submitted_at)}</span>
+                      )}
                     </td>
                     <td className="px-5 py-3.5 text-right font-bold text-slate-800">
                       {r.hasil}

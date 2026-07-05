@@ -18,10 +18,24 @@ export default async function InputLaporanPage() {
     );
   }
 
-  const [{ data }, iu] = await Promise.all([
+  const [{ data }, iu, { data: unitRow }] = await Promise.all([
     supabase.from("indicators").select("id, nomor, nama, satuan, target").eq("aktif", true).order("nomor", { ascending: true }),
     supabase.from("indicator_units").select("indicator_id, unit_id"),
+    supabase.from("units").select("id").eq("id", unitId).maybeSingle(),
   ]);
+
+  // Proteksi: unit_id akun menunjuk ke unit yang sudah tidak ada -> cegah error
+  // FK yang membingungkan saat submit; arahkan ke Tim Mutu.
+  if (!unitRow) {
+    return (
+      <div className="rounded-2xl border border-amber-200 bg-amber-50/50 p-6 text-sm text-amber-800 shadow-sm leading-relaxed">
+        <p className="font-bold text-amber-900">Unit Akun Tidak Valid</p>
+        <p className="mt-1">
+          Unit yang tertaut ke akun Anda tidak ditemukan (mungkin telah dihapus atau diubah). Hubungi <strong>Tim Mutu</strong> untuk menetapkan ulang unit kerja Anda sebelum mengisi laporan.
+        </p>
+      </div>
+    );
+  }
 
   // Indikator "khusus" hanya muncul untuk unit penanggungjawabnya; tanpa penugasan = umum (semua unit).
   const assignedUnits = new Map<number, Set<number>>();

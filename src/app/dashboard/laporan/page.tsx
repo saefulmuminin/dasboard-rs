@@ -10,6 +10,7 @@ type Row = {
   bulan: number;
   hasil: number;
   status: "draft" | "submitted" | "approved" | "rejected";
+  submitted_at: string | null;
   indicators: { nomor: number | null; nama: string; satuan: string } | null;
 };
 
@@ -30,7 +31,7 @@ export default async function LaporanSayaPage() {
 
   const { data } = await supabase
     .from("reports")
-    .select("id, tahun, bulan, hasil, status, indicators(nomor, nama, satuan)")
+    .select("id, tahun, bulan, hasil, status, submitted_at, indicators(nomor, nama, satuan)")
     .eq("unit_id", unitId)
     .order("tahun", { ascending: false })
     .order("bulan", { ascending: false });

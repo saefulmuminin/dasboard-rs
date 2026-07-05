@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { NAMA_BULAN } from "@/lib/site";
+import { NAMA_BULAN, fmtWaktu } from "@/lib/site";
 import { showConfirm, showError, showToast } from "@/lib/swal";
 
 type Row = {
@@ -16,6 +16,7 @@ type Row = {
   analisa: string | null;
   rtl: string | null;
   bukti_url: string | null;
+  submitted_at: string | null;
   indicators: { nomor: number | null; nama: string; satuan: string; target: number | null } | null;
   units: { nama: string } | null;
 };
@@ -99,6 +100,9 @@ export default function VerifikasiList({
                 </h3>
                 <p className="mt-1 text-xs text-slate-400">
                   Periode Laporan: {NAMA_BULAN[r.bulan]} {r.tahun}
+                </p>
+                <p className="mt-0.5 text-xs text-slate-400">
+                  Dikirim: <span className="font-semibold text-slate-500">{fmtWaktu(r.submitted_at)}</span>
                 </p>
               </div>
 

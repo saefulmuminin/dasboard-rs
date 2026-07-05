@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { showConfirm, showError, showToast } from "@/lib/swal";
-import { NAMA_BULAN } from "@/lib/site";
+import { NAMA_BULAN, fmtWaktu } from "@/lib/site";
 
 export type Opt = { id: number; nama: string };
 type Row = {
@@ -15,6 +15,7 @@ type Row = {
   hasil: number;
   status: string;
   nama_pengisi: string | null;
+  submitted_at: string | null;
   indicators: { nomor: number | null; nama: string } | null;
   units: { nama: string } | null;
 };
@@ -42,7 +43,7 @@ export default function KelolaLaporanList({ units }: { units: Opt[] }) {
     setLoading(true);
     let q = supabase
       .from("reports")
-      .select("id, tahun, bulan, numerator, denominator, hasil, status, nama_pengisi, indicators(nomor,nama), units(nama)")
+      .select("id, tahun, bulan, numerator, denominator, hasil, status, nama_pengisi, submitted_at, indicators(nomor,nama), units(nama)")
       .eq("tahun", tahun)
       .order("bulan", { ascending: false });
     if (bulan) q = q.eq("bulan", bulan);
@@ -136,6 +137,7 @@ export default function KelolaLaporanList({ units }: { units: Opt[] }) {
                 <th className="px-4 py-3 text-center">Num/Den</th>
                 <th className="px-4 py-3 text-center">Hasil</th>
                 <th className="px-4 py-3">Pengisi</th>
+                <th className="px-4 py-3 whitespace-nowrap">Dikirim</th>
                 <th className="px-4 py-3 text-center">Status</th>
                 <th className="px-4 py-3 text-right">Aksi</th>
               </tr>
@@ -143,7 +145,7 @@ export default function KelolaLaporanList({ units }: { units: Opt[] }) {
             <tbody className="divide-y divide-slate-100">
               {rows.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-8 text-center text-slate-400">
+                  <td colSpan={9} className="px-4 py-8 text-center text-slate-400">
                     {loading ? "Memuat..." : "Tidak ada laporan pada filter ini."}
                   </td>
                 </tr>
@@ -159,6 +161,7 @@ export default function KelolaLaporanList({ units }: { units: Opt[] }) {
                     <td className="px-4 py-3 text-center text-slate-600">{r.numerator}/{r.denominator}</td>
                     <td className="px-4 py-3 text-center font-semibold text-slate-800">{r.hasil}%</td>
                     <td className="px-4 py-3 text-slate-500">{r.nama_pengisi ?? "-"}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-xs text-slate-500">{fmtWaktu(r.submitted_at)}</td>
                     <td className="px-4 py-3 text-center">
                       <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_CLS[r.status] ?? "bg-slate-100 text-slate-600"}`}>
                         {STATUS_LABEL[r.status] ?? r.status}
