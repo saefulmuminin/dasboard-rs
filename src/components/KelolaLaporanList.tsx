@@ -41,21 +41,23 @@ export default function KelolaLaporanList({ units }: { units: Opt[] }) {
 
   async function muat() {
     setLoading(true);
-    let q = supabase
-      .from("reports")
-      .select("id, tahun, bulan, numerator, denominator, hasil, status, nama_pengisi, submitted_at, indicators(nomor,nama), units(nama)")
-      .eq("tahun", tahun)
-      .order("bulan", { ascending: false });
-    if (bulan) q = q.eq("bulan", bulan);
-    if (unitId !== "all") q = q.eq("unit_id", unitId);
-    if (status !== "all") q = q.eq("status", status);
-    const { data, error } = await q;
+    const base = "id, tahun, bulan, numerator, denominator, hasil, status, nama_pengisi, indicators(nomor,nama), units(nama)";
+    const run = (sel: string) => {
+      let q = supabase.from("reports").select(sel).eq("tahun", tahun).order("bulan", { ascending: false });
+      if (bulan) q = q.eq("bulan", bulan);
+      if (unitId !== "all") q = q.eq("unit_id", unitId);
+      if (status !== "all") q = q.eq("status", status);
+      return q;
+    };
+    // Coba dengan submitted_at; fallback tanpa itu bila kolom belum ada (migrasi belum jalan).
+    let res = await run(`${base}, submitted_at`);
+    if (res.error) res = await run(base);
     setLoading(false);
-    if (error) {
-      showError("Gagal Memuat", error.message);
+    if (res.error) {
+      showError("Gagal Memuat", res.error.message);
       return;
     }
-    setRows((data as unknown as Row[]) ?? []);
+    setRows((res.data as unknown as Row[]) ?? []);
   }
 
   useEffect(() => {

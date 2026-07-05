@@ -29,14 +29,14 @@ export default async function LaporanSayaPage() {
     );
   }
 
-  const { data } = await supabase
-    .from("reports")
-    .select("id, tahun, bulan, hasil, status, submitted_at, indicators(nomor, nama, satuan)")
-    .eq("unit_id", unitId)
-    .order("tahun", { ascending: false })
-    .order("bulan", { ascending: false });
+  const base = "id, tahun, bulan, hasil, status, indicators(nomor, nama, satuan)";
+  const q = (sel: string) =>
+    supabase.from("reports").select(sel).eq("unit_id", unitId).order("tahun", { ascending: false }).order("bulan", { ascending: false });
+  // Coba dengan submitted_at; fallback tanpa itu bila kolom belum ada.
+  let res = await q(`${base}, submitted_at`);
+  if (res.error) res = await q(base);
 
-  const rows = (data as unknown as Row[]) ?? [];
+  const rows = (res.data as unknown as Row[]) ?? [];
 
   return (
     <div className="space-y-6">

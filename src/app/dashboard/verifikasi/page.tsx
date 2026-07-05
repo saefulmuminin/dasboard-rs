@@ -22,16 +22,14 @@ type Row = {
 export default async function VerifikasiPage() {
   const { supabase, user } = await requireMutu();
 
-  const { data } = await supabase
-    .from("reports")
-    .select(
-      "id, tahun, bulan, numerator, denominator, hasil, nama_pengisi, analisa, rtl, bukti_url, submitted_at, indicators(nomor, nama, satuan, target), units(nama)",
-    )
-    .eq("status", "submitted")
-    .order("tahun", { ascending: false })
-    .order("bulan", { ascending: false });
+  const base = "id, tahun, bulan, numerator, denominator, hasil, nama_pengisi, analisa, rtl, bukti_url, indicators(nomor, nama, satuan, target), units(nama)";
+  const q = (sel: string) =>
+    supabase.from("reports").select(sel).eq("status", "submitted").order("tahun", { ascending: false }).order("bulan", { ascending: false });
+  // Coba dengan submitted_at; jika kolom belum ada (migrasi belum jalan), fallback tanpa itu.
+  let res = await q(`${base}, submitted_at`);
+  if (res.error) res = await q(base);
 
-  const rows = (data as unknown as Row[]) ?? [];
+  const rows = (res.data as unknown as Row[]) ?? [];
 
   // Signed URL bukti
   const signedUrls: Record<number, string> = {};
