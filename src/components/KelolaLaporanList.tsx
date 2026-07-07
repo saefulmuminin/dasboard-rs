@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { showConfirm, showError, showToast } from "@/lib/swal";
@@ -162,21 +163,29 @@ export default function KelolaLaporanList({ units }: { units: Opt[] }) {
                     <td className="px-4 py-3 whitespace-nowrap text-slate-600">{NAMA_BULAN[r.bulan]} {r.tahun}</td>
                     <td className="px-4 py-3 text-center text-slate-600">{r.numerator}/{r.denominator}</td>
                     <td className="px-4 py-3 text-center font-semibold text-slate-800">{r.hasil}%</td>
-                    <td className="px-4 py-3 text-slate-500">{r.nama_pengisi ?? "-"}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-slate-500">{r.nama_pengisi ?? "-"}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-xs text-slate-500">{fmtWaktu(r.submitted_at)}</td>
                     <td className="px-4 py-3 text-center">
                       <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_CLS[r.status] ?? "bg-slate-100 text-slate-600"}`}>
                         {STATUS_LABEL[r.status] ?? r.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-right">
-                      <button
-                        onClick={() => hapus(r)}
-                        disabled={busyId === r.id}
-                        className="rounded-lg border border-red-100 bg-red-50/50 px-3.5 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50 hover:text-red-700 active:scale-[0.98] disabled:opacity-50"
-                      >
-                        {busyId === r.id ? "Menghapus..." : "Hapus"}
-                      </button>
+                    <td className="px-4 py-3">
+                      <div className="flex justify-end gap-2">
+                        <Link
+                          href={`/dashboard/kelola-laporan/${r.id}`}
+                          className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 active:scale-[0.98]"
+                        >
+                          Detail
+                        </Link>
+                        <button
+                          onClick={() => hapus(r)}
+                          disabled={busyId === r.id}
+                          className="rounded-lg border border-red-100 bg-red-50/50 px-3.5 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50 hover:text-red-700 active:scale-[0.98] disabled:opacity-50"
+                        >
+                          {busyId === r.id ? "Menghapus..." : "Hapus"}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))

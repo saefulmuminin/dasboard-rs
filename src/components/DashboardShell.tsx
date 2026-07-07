@@ -254,12 +254,12 @@ export default function DashboardShell({
 
         {/* Content */}
         <main className="flex-1 p-5 sm:p-8">
-          <div className="mx-auto max-w-5xl">{children}</div>
+          <div className="mx-auto max-w-7xl">{children}</div>
         </main>
 
         {/* Footer */}
         <footer className="border-t border-slate-100 bg-white px-5 py-4 sm:px-8">
-          <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-1 sm:flex-row">
+          <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-1 sm:flex-row">
             <p className="text-xs text-slate-400">
               © {tahun} Tim Mutu {SITE.rs}. Semua hak dilindungi.
             </p>
