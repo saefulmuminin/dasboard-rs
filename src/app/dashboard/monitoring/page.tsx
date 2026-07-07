@@ -5,6 +5,7 @@ import MonitoringCharts, {
   type IndPoint, type UnitPoint, type TrendPoint,
 } from "@/components/MonitoringCharts";
 import IndicatorReportSection, { type IndReport } from "@/components/IndicatorReportSection";
+import PeriodFilter from "@/components/PeriodFilter";
 import { rsOfficial } from "@/lib/rsOfficialTotals";
 
 export const dynamic = "force-dynamic";
@@ -13,8 +14,13 @@ type Indikator = { id: number; nomor: number | null; nama: string; satuan: strin
 type Rep = { indicator_id: number; unit_id: number; tahun: number; bulan: number; numerator: number; denominator: number };
 
 const r2 = (n: number) => Math.round(n * 100) / 100;
+const pkey = (r: Rep) => r.tahun * 100 + r.bulan;
 
-export default async function MonitoringPage() {
+export default async function MonitoringPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ periods?: string }>;
+}) {
   const { supabase } = await requireMutu();
 
   const [{ data: indData }, { data: repData }, { data: unitData }] = await Promise.all([
@@ -27,9 +33,20 @@ export default async function MonitoringPage() {
   const reports = (repData as Rep[]) ?? [];
   const unitName = new Map(((unitData as { id: number; nama: string }[]) ?? []).map((u) => [u.id, u.nama]));
 
-  // --- per indikator: capaian periode terbaru ---
+  // --- periode tersedia + terpilih (default: bulan terbaru) ---
+  const allPeriods = [...new Set(reports.map(pkey))].sort((a, b) => b - a);
+  const latest = allPeriods[0];
+  const sp = await searchParams;
+  let selected = sp?.periods
+    ? sp.periods.split(",").map(Number).filter((k) => allPeriods.includes(k))
+    : [];
+  if (!selected.length) selected = latest != null ? [latest] : [];
+  const selSet = new Set(selected);
+  const filtered = reports.filter((r) => selSet.has(pkey(r)));
+
+  // --- per indikator: capaian gabungan periode terpilih (Σnum/Σden, override rsOfficial per bulan) ---
   const byInd = new Map<number, Rep[]>();
-  for (const r of reports) {
+  for (const r of filtered) {
     const a = byInd.get(r.indicator_id) ?? [];
     a.push(r); byInd.set(r.indicator_id, a);
   }
@@ -37,13 +54,17 @@ export default async function MonitoringPage() {
     const rs = byInd.get(ind.id) ?? [];
     let capaian: number | null = null;
     if (rs.length) {
-      const maxKey = Math.max(...rs.map((r) => r.tahun * 100 + r.bulan));
-      const ty = Math.floor(maxKey / 100), bl = maxKey % 100;
-      const latest = rs.filter((r) => r.tahun * 100 + r.bulan === maxKey);
-      let num = latest.reduce((s, r) => s + (Number(r.numerator) || 0), 0);
-      let den = latest.reduce((s, r) => s + (Number(r.denominator) || 0), 0);
-      const off = rsOfficial(ind.nomor, ty, bl); // total resmi RS bila ada
-      if (off) { num = off.num; den = off.den; }
+      const mk = [...new Set(rs.map(pkey))];
+      let num = 0, den = 0;
+      for (const k of mk) {
+        const ty = Math.floor(k / 100), bl = k % 100;
+        const mr = rs.filter((r) => pkey(r) === k);
+        let mnum = mr.reduce((s, r) => s + (Number(r.numerator) || 0), 0);
+        let mden = mr.reduce((s, r) => s + (Number(r.denominator) || 0), 0);
+        const off = rsOfficial(ind.nomor, ty, bl);
+        if (off) { mnum = off.num; mden = off.den; }
+        num += mnum; den += mden;
+      }
       capaian = den > 0 ? r2((num / den) * 100) : 0;
     }
     const tercapai = capaian != null && ind.target != null ? capaian >= ind.target : null;
@@ -62,9 +83,9 @@ export default async function MonitoringPage() {
     tanpaData: perIndCalc.filter((r) => r.capaian == null).length,
   };
 
-  // --- per unit: Σnum/Σden ---
+  // --- per unit: Σnum/Σden (periode terpilih) ---
   const byUnit = new Map<number, { num: number; den: number }>();
-  for (const r of reports) {
+  for (const r of filtered) {
     const a = byUnit.get(r.unit_id) ?? { num: 0, den: 0 };
     a.num += Number(r.numerator) || 0; a.den += Number(r.denominator) || 0;
     byUnit.set(r.unit_id, a);
@@ -73,10 +94,10 @@ export default async function MonitoringPage() {
     .map(([uid, v]) => ({ nama: unitName.get(uid) ?? `Unit ${uid}`, capaian: v.den > 0 ? r2((v.num / v.den) * 100) : 0 }))
     .sort((a, b) => b.capaian - a.capaian);
 
-  // --- tren bulanan ---
+  // --- tren bulanan: SELALU seluruh periode (konteks riwayat) ---
   const byMonth = new Map<number, { tahun: number; bulan: number; num: number; den: number }>();
   for (const r of reports) {
-    const key = r.tahun * 100 + r.bulan;
+    const key = pkey(r);
     const a = byMonth.get(key) ?? { tahun: r.tahun, bulan: r.bulan, num: 0, den: 0 };
     a.num += Number(r.numerator) || 0; a.den += Number(r.denominator) || 0;
     byMonth.set(key, a);
@@ -85,8 +106,8 @@ export default async function MonitoringPage() {
     .sort((a, b) => a.tahun - b.tahun || a.bulan - b.bulan)
     .map((m) => ({ label: `${NAMA_BULAN[m.bulan]?.slice(0, 3)} ${m.tahun}`, capaian: m.den > 0 ? r2((m.num / m.den) * 100) : 0 }));
 
-  // --- per indikator: data lengkap untuk diagram laporan (unit x bulan + capaian/target) ---
-  const multiYear = new Set(reports.map((r) => r.tahun)).size > 1;
+  // --- per indikator: data lengkap untuk diagram laporan (unit x bulan) — periode terpilih ---
+  const multiYear = new Set(filtered.map((r) => r.tahun)).size > 1;
   const mlabel = (t: number, b: number) =>
     multiYear ? `${NAMA_BULAN[b]?.slice(0, 3)} ${t}` : (NAMA_BULAN[b] ?? `${b}`);
 
@@ -94,7 +115,7 @@ export default async function MonitoringPage() {
     .filter((ind) => (byInd.get(ind.id)?.length ?? 0) > 0)
     .map((ind) => {
       const rs = byInd.get(ind.id)!;
-      const monthKeys = [...new Set(rs.map((r) => r.tahun * 100 + r.bulan))].sort((a, b) => a - b);
+      const monthKeys = [...new Set(rs.map(pkey))].sort((a, b) => a - b);
       const months = monthKeys.map((k) => mlabel(Math.floor(k / 100), k % 100));
       const unitList = [...new Set(rs.map((r) => r.unit_id))]
         .map((id) => ({ id, nama: unitName.get(id) ?? `Unit ${id}` }))
@@ -104,7 +125,7 @@ export default async function MonitoringPage() {
       const grid = unitList.map((u) => {
         const row: Record<string, number | string | null> = { unit: u.nama };
         for (const k of monthKeys) {
-          const rep = rs.find((r) => r.unit_id === u.id && r.tahun * 100 + r.bulan === k);
+          const rep = rs.find((r) => r.unit_id === u.id && pkey(r) === k);
           row[mlabel(Math.floor(k / 100), k % 100)] = rep
             ? (Number(rep.denominator) > 0 ? r2((Number(rep.numerator) / Number(rep.denominator)) * 100) : 0)
             : null;
@@ -112,13 +133,12 @@ export default async function MonitoringPage() {
         return row;
       });
 
-      // Total RS keseluruhan per bulan: Σnumerator, Σdenominator, Hasil = Σnum/Σden×100
       const rsTotals = monthKeys.map((k) => {
         const ty = Math.floor(k / 100), bl = k % 100;
-        const mr = rs.filter((r) => r.tahun * 100 + r.bulan === k);
+        const mr = rs.filter((r) => pkey(r) === k);
         let num = mr.reduce((s, r) => s + (Number(r.numerator) || 0), 0);
         let den = mr.reduce((s, r) => s + (Number(r.denominator) || 0), 0);
-        const off = rsOfficial(ind.nomor, ty, bl); // total resmi RS bila ada
+        const off = rsOfficial(ind.nomor, ty, bl);
         if (off) { num = off.num; den = off.den; }
         return { label: mlabel(ty, bl), num, den, hasil: den > 0 ? r2((num / den) * 100) : 0 };
       });
@@ -127,13 +147,17 @@ export default async function MonitoringPage() {
       return { id: ind.id, nomor: ind.nomor, nama: ind.nama, satuan: ind.satuan, target: ind.target, months, units, grid, line, rsTotals };
     });
 
-  // --- KPI ---
-  const gNum = reports.reduce((s, r) => s + (Number(r.numerator) || 0), 0);
-  const gDen = reports.reduce((s, r) => s + (Number(r.denominator) || 0), 0);
+  // --- KPI (periode terpilih) ---
+  const gNum = filtered.reduce((s, r) => s + (Number(r.numerator) || 0), 0);
+  const gDen = filtered.reduce((s, r) => s + (Number(r.denominator) || 0), 0);
   const avgCapaian = gDen > 0 ? r2((gNum / gDen) * 100) : 0;
-  const unitMelapor = new Set(reports.map((r) => r.unit_id)).size;
+  const unitMelapor = new Set(filtered.map((r) => r.unit_id)).size;
   const indikatorDataAda = perIndCalc.filter((r) => r.capaian != null).length;
   const adaData = reports.length > 0;
+
+  const periodeText = selected.length === allPeriods.length
+    ? "semua periode"
+    : selected.map((k) => `${NAMA_BULAN[k % 100]} ${Math.floor(k / 100)}`).join(", ");
 
   const kpis = [
     { label: "Capaian Keseluruhan", value: `${avgCapaian}%`, tone: "brand" },
@@ -141,7 +165,7 @@ export default async function MonitoringPage() {
     { label: "Belum Tercapai", value: status.belum, tone: "red" },
     { label: "Indikator Terpantau", value: `${indikatorDataAda}/${indikators.length}`, tone: "slate" },
     { label: "Unit Melapor", value: unitMelapor, tone: "slate" },
-    { label: "Total Laporan", value: reports.length, tone: "slate" },
+    { label: "Total Laporan", value: filtered.length, tone: "slate" },
   ];
   const toneCls: Record<string, string> = {
     brand: "text-brand-700", green: "text-green-600", red: "text-red-600", slate: "text-slate-800",
@@ -151,7 +175,7 @@ export default async function MonitoringPage() {
     <div>
       <h1 className="text-2xl font-bold text-slate-800">Monitoring Mutu</h1>
       <p className="mt-1 text-sm text-slate-500">
-        Ringkasan capaian indikator mutu (data yang sudah disetujui).
+        Ringkasan capaian indikator mutu (data disetujui) — periode: <span className="font-semibold text-slate-600">{periodeText}</span>.
       </p>
 
       {!adaData ? (
@@ -160,6 +184,13 @@ export default async function MonitoringPage() {
         </div>
       ) : (
         <>
+          {/* Filter periode */}
+          {allPeriods.length > 0 && (
+            <div className="mt-6">
+              <PeriodFilter allPeriods={allPeriods} selected={selected} />
+            </div>
+          )}
+
           {/* KPI cards */}
           <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-6">
             {kpis.map((k) => (
