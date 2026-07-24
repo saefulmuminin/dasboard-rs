@@ -55,10 +55,10 @@ export default async function Home() {
             Transparansi Pelayanan Publik
           </span>
           <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-tight max-w-4xl mx-auto drop-shadow-sm">
-            Pelaporan & Monitoring Indikator Mutu
+            Pelaporan & Monitoring Data Mutu
           </h1>
           <p className="max-w-2xl mx-auto text-base sm:text-lg text-slate-300 leading-relaxed font-medium drop-shadow-sm">
-            Keterbukaan informasi dan publikasi berkala atas capaian indikator mutu pelayanan kesehatan nasional pada {SITE.rs}.
+            Keterbukaan informasi dan publikasi berkala atas capaian data mutu pelayanan kesehatan nasional pada {SITE.rs}.
           </p>
           <div className="pt-6 flex justify-center">
             <Link
@@ -78,7 +78,7 @@ export default async function Home() {
       <section className="mx-auto max-w-5xl px-5 py-16 sm:py-24">
         <div className="mb-10 text-center sm:text-left">
           <h2 className="text-3xl font-black text-slate-900 tracking-tight">
-            Indikator Mutu Nasional (INM)
+            Data Mutu Nasional (INM)
           </h2>
           <p className="mt-2 text-base text-slate-500 font-medium">
             Memantau {indikator.length} indikator aktif di lingkungan {SITE.rs}.

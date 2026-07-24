@@ -63,7 +63,7 @@ export default async function EditLaporanPage({
       <div>
         <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Edit Laporan</h1>
         <p className="mt-1.5 text-sm text-slate-500">
-          Ubah dan perbarui data capaian indikator mutu pelayanan unit Anda untuk periode terkait.
+          Ubah dan perbarui data capaian data mutu pelayanan unit Anda untuk periode terkait.
         </p>
       </div>
       <div className="rounded-3xl border border-slate-100 bg-white p-6 sm:p-8 shadow-sm">

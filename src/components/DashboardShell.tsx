@@ -264,7 +264,7 @@ export default function DashboardShell({
               © {tahun} Tim Mutu {SITE.rs}. Semua hak dilindungi.
             </p>
             <p className="text-xs text-slate-400">
-              {SITE.nama} — Sistem Monitoring Indikator Mutu
+              {SITE.nama} — Sistem Monitoring Data Mutu
             </p>
           </div>
         </footer>

@@ -175,7 +175,7 @@ export default async function MonitoringPage({
     <div>
       <h1 className="text-2xl font-bold text-slate-800">Monitoring Mutu</h1>
       <p className="mt-1 text-sm text-slate-500">
-        Ringkasan capaian indikator mutu (data disetujui) — periode: <span className="font-semibold text-slate-600">{periodeText}</span>.
+        Ringkasan capaian data mutu (data disetujui) — periode: <span className="font-semibold text-slate-600">{periodeText}</span>.
       </p>
 
       {!adaData ? (

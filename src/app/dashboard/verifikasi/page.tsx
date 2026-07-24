@@ -51,7 +51,7 @@ export default async function VerifikasiPage() {
       <div>
         <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Verifikasi Laporan</h1>
         <p className="mt-1.5 text-sm text-slate-500">
-          Tinjau berkas laporan indikator mutu pelayanan yang diajukan oleh tiap unit sebelum dipublikasikan.
+          Tinjau berkas laporan data mutu pelayanan yang diajukan oleh tiap unit sebelum dipublikasikan.
         </p>
       </div>
 

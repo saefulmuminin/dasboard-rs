@@ -36,7 +36,7 @@ export default function TentangPage() {
             {SITE.rs} senantiasa berkomitmen untuk menyajikan pelayanan kesehatan terbaik, aman, bermutu tinggi, serta dapat dijangkau oleh seluruh kalangan masyarakat luas.
           </p>
           <p>
-            Melalui platform inovasi <strong>{SITE.nama}</strong>, sistem pencatatan dan evaluasi indikator mutu pelayanan kami publikasikan secara transparan. Hal ini merupakan bagian dari upaya perbaikan berkelanjutan demi kepuasan dan keselamatan pasien.
+            Melalui platform inovasi <strong>{SITE.nama}</strong>, sistem pencatatan dan evaluasi data mutu pelayanan kami publikasikan secara transparan. Hal ini merupakan bagian dari upaya perbaikan berkelanjutan demi kepuasan dan keselamatan pasien.
           </p>
         </div>
       </section>

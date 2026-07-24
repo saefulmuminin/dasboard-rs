@@ -7,7 +7,7 @@ export default function SiteFooter() {
         <div className="space-y-2.5">
           <p className="font-extrabold text-brand-700 leading-tight">{SITE.nama}</p>
           <p className="text-xs font-semibold text-slate-400 leading-relaxed max-w-xs">
-            Sistem informasi transparansi pelaporan & monitoring indikator mutu pelayanan kesehatan pada {SITE.rs}.
+            Sistem informasi transparansi pelaporan & monitoring data mutu pelayanan kesehatan pada {SITE.rs}.
           </p>
         </div>
         <div className="text-xs text-slate-500 space-y-2">

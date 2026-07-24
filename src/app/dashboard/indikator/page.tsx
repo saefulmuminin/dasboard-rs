@@ -24,9 +24,9 @@ export default async function KelolaIndikatorPage() {
     <div className="space-y-8">
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Kelola Indikator Mutu</h1>
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Kelola Data Mutu</h1>
           <p className="mt-1.5 text-sm text-slate-500">
-            Kelola parameter indikator mutu pelayanan rumah sakit, atur target pencapaian, serta kelola status aktifnya.
+            Kelola parameter data mutu pelayanan rumah sakit, atur target pencapaian, serta kelola status aktifnya.
           </p>
         </div>
         <IndikatorManager initial={indikator} />

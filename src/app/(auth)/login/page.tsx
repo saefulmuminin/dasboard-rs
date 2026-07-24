@@ -54,7 +54,7 @@ export default async function LoginPage() {
           <h2 className="text-3xl font-bold tracking-tight">{SITE.nama}</h2>
           <p className="mt-2 text-lg font-medium text-slate-200">{SITE.rs}</p>
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-slate-350">
-            Pelaporan &amp; monitoring indikator mutu pelayanan rumah sakit secara
+            Pelaporan &amp; monitoring data mutu pelayanan rumah sakit secara
             terpusat dan real-time.
           </p>
 

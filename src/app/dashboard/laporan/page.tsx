@@ -44,7 +44,7 @@ export default async function LaporanSayaPage() {
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Laporan Saya</h1>
           <p className="mt-1.5 text-sm text-slate-500">
-            Daftar pengajuan laporan indikator mutu unit pelayanan Anda.
+            Daftar pengajuan laporan data mutu unit pelayanan Anda.
           </p>
         </div>
         <Link

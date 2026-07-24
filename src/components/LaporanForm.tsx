@@ -198,7 +198,7 @@ export default function LaporanForm({
       </div>
 
       <div>
-        <label className={labelCls}>Indikator Mutu</label>
+        <label className={labelCls}>Data Mutu</label>
         <select
           value={indicatorId}
           onChange={(e) => setIndicatorId(Number(e.target.value))}

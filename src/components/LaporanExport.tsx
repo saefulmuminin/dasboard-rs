@@ -158,7 +158,7 @@ export default function LaporanExport({ indikators, units }: { indikators: ExpIn
       if (c > maxC) maxC = c;
     };
 
-    put(R, 0, `LAPORAN INDIKATOR MUTU — ${SITE.rs}`, "s", stTitle);
+    put(R, 0, `LAPORAN DATA MUTU — ${SITE.rs}`, "s", stTitle);
     merges.push({ s: { r: R, c: 0 }, e: { r: R, c: 6 } });
     R++;
     put(R, 0, `Periode: ${periodeLabel}${scopeLabel}`, "s", stSub);
@@ -246,7 +246,7 @@ export default function LaporanExport({ indikators, units }: { indikators: ExpIn
         th.tot, td.tot { background: #ccfbf1; font-weight: 700; }
         .note { color: #94a3b8; font-style: italic; margin: 2px 0 8px; }
       </style></head><body>
-      <h1>LAPORAN INDIKATOR MUTU — ${esc(SITE.rs)}</h1>
+      <h1>LAPORAN DATA MUTU — ${esc(SITE.rs)}</h1>
       <p class="sub">Periode: ${esc(periodeLabel)}${scopeLabel}</p>
       ${body}
       <script>window.onload=function(){window.print();}</script>
@@ -329,7 +329,7 @@ export default function LaporanExport({ indikators, units }: { indikators: ExpIn
       {meta != null && adaData && (
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="mb-4 border-b border-slate-100 pb-3">
-            <h2 className="text-lg font-bold text-slate-800">Laporan Indikator Mutu — {SITE.rs}</h2>
+            <h2 className="text-lg font-bold text-slate-800">Laporan Data Mutu — {SITE.rs}</h2>
             <p className="text-sm italic text-slate-500">Periode: {periodeLabel}{scopeLabel}</p>
           </div>
           <div className="space-y-6">

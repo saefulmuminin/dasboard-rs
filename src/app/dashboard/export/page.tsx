@@ -16,7 +16,7 @@ export default async function ExportLaporanPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-slate-800">Export Laporan Mutu</h1>
         <p className="mt-1 text-sm text-slate-500">
-          Unduh rekap indikator mutu per bulan (format resmi: unit sebagai kolom, baris Numerator/Denumerator/Hasil) dalam Excel atau PDF.
+          Unduh rekap data mutu per bulan (format resmi: unit sebagai kolom, baris Numerator/Denumerator/Hasil) dalam Excel atau PDF.
         </p>
       </div>
       <LaporanExport indikators={(inds as ExpInd[]) ?? []} units={(units as ExpUnit[]) ?? []} />

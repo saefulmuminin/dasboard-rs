@@ -93,7 +93,7 @@ export default async function DashboardHome() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-800">Dashboard Tim Mutu</h1>
-          <p className="mt-1 text-sm text-slate-500">Ringkasan pelaporan dan indikator mutu pelayanan rumah sakit.</p>
+          <p className="mt-1 text-sm text-slate-500">Ringkasan pelaporan dan data mutu pelayanan rumah sakit.</p>
         </div>
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">

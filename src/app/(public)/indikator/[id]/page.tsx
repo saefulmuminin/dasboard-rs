@@ -99,7 +99,7 @@ export default async function DetailIndikatorPage({
           {indikator.nomor ?? "•"}
         </span>
         <div className="space-y-1 mt-1">
-          <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Indikator Mutu Nasional</p>
+          <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Data Mutu Nasional</p>
           <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-slate-900 leading-tight">
             {indikator.nama}
           </h1>

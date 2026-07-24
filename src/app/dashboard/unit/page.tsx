@@ -15,7 +15,7 @@ export default async function KelolaUnitPage() {
       <div>
         <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Kelola Unit / Ruangan</h1>
         <p className="mt-1.5 text-sm text-slate-500">
-          Daftar dan kelola status keaktifan unit pelayanan yang berkewajiban melaporkan indikator mutu pelayanan.
+          Daftar dan kelola status keaktifan unit pelayanan yang berkewajiban melaporkan data mutu pelayanan.
         </p>
       </div>
       <UnitManager initial={(data as Unit[]) ?? []} />

@@ -85,7 +85,7 @@ export default function IndikatorManager({ initial }: { initial: Ind[] }) {
   async function hapus(id: number) {
     const result = await showConfirm(
       "Hapus Indikator?",
-      "Tindakan ini akan menghapus indikator mutu. Operasi akan gagal jika sudah ada data laporan yang dikaitkan dengan indikator ini.",
+      "Tindakan ini akan menghapus data mutu. Operasi akan gagal jika sudah ada data laporan yang dikaitkan dengan indikator ini.",
       "Ya, Hapus",
       "Batal"
     );
@@ -126,7 +126,7 @@ export default function IndikatorManager({ initial }: { initial: Ind[] }) {
             value={nama}
             onChange={(e) => setNama(e.target.value)}
             className={`${inp} w-full`}
-            placeholder="Masukkan nama indikator mutu..."
+            placeholder="Masukkan nama data mutu..."
           />
         </div>
         <div className="w-20">
@@ -163,7 +163,7 @@ export default function IndikatorManager({ initial }: { initial: Ind[] }) {
             <thead>
               <tr className="border-b border-slate-100 bg-slate-50/75 text-xs font-bold uppercase tracking-wider text-slate-400">
                 <th className="px-5 py-4 w-16 text-center">No.</th>
-                <th className="px-5 py-4">Nama Indikator Mutu</th>
+                <th className="px-5 py-4">Nama Data Mutu</th>
                 <th className="px-5 py-4 w-24">Satuan</th>
                 <th className="px-5 py-4 w-28">Target</th>
                 <th className="px-5 py-4 w-24 text-center">Aktif</th>

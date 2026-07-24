@@ -55,7 +55,7 @@ export default async function InputLaporanPage() {
       <div>
         <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Input Laporan Baru</h1>
         <p className="mt-1.5 text-sm text-slate-500">
-          Masukkan capaian bulanan numerator dan denominator dari indikator mutu pelayanan unit Anda.
+          Masukkan capaian bulanan numerator dan denominator dari data mutu pelayanan unit Anda.
         </p>
       </div>
       <div className="rounded-3xl border border-slate-100 bg-white p-6 sm:p-8 shadow-sm">
